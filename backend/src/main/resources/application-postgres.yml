@@ -1,0 +1,10 @@
+# Activate with: SPRING_PROFILES_ACTIVE=postgres ./mvnw spring-boot:run
+# (docker compose up db   starts a matching PostgreSQL container)
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/studentdb}
+    username: ${DB_USERNAME:student}
+    password: ${DB_PASSWORD:student}
+  h2:
+    console:
+      enabled: false

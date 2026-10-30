@@ -1,0 +1,85 @@
+@if (loading$ | async) {
+  <mat-progress-bar class="global-progress" mode="indeterminate" aria-label="Loading" />
+}
+
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+    [mode]="isHandset() ? 'over' : 'side'"
+    [opened]="!isHandset()"
+    [fixedInViewport]="isHandset()"
+  >
+    <a class="brand" routerLink="/dashboard">
+      <span class="logo"><mat-icon>school</mat-icon></span>
+      <span class="brand-text">
+        <strong>Student</strong>
+        <span>Management</span>
+      </span>
+    </a>
+
+    <mat-nav-list class="nav">
+      @for (item of navItems; track item.link) {
+        <a
+          mat-list-item
+          [routerLink]="item.link"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive"
+          [attr.aria-current]="rla.isActive ? 'page' : null"
+        >
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <div class="sidenav-footer">
+      <a
+        class="api-link"
+        href="http://localhost:8080/swagger-ui.html"
+        target="_blank"
+        rel="noopener"
+      >
+        <mat-icon>api</mat-icon>
+        <span>API docs (Swagger)</span>
+        <mat-icon class="external">open_in_new</mat-icon>
+      </a>
+      <p class="credit">Built by Ravi Teja</p>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <mat-toolbar class="toolbar">
+      @if (isHandset()) {
+        <button matIconButton (click)="sidenav.toggle()" aria-label="Open navigation">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="toolbar-title">Student Management</span>
+      }
+      <button
+        class="search-trigger"
+        (click)="openPalette()"
+        aria-label="Search (Ctrl K)"
+        data-testid="open-palette"
+      >
+        <mat-icon>search</mat-icon>
+        <span class="search-text">Search students, courses…</span>
+        <kbd>{{ shortcut }}</kbd>
+      </button>
+      <span class="spacer"></span>
+      <button
+        matIconButton
+        (click)="theme.toggle()"
+        [matTooltip]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        aria-label="Toggle dark mode"
+      >
+        <mat-icon>{{ themeIcon() }}</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <main>
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,227 @@
+@use '@angular/material' as mat;
+
+// ---------------------------------------------------------------------------
+// Theme: Material 3 with light-dark() colors. Dark mode is a `color-scheme`
+// switch on <html> (see ThemeService), so every --mat-sys-* variable adapts.
+// ---------------------------------------------------------------------------
+html {
+  color-scheme: light;
+  height: 100%;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$violet-palette,
+      ),
+      typography: (
+        plain-family: 'Inter, Roboto, sans-serif',
+        brand-family: 'Inter, Roboto, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+
+  // App-wide component tweaks.
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: 10px,
+    )
+  );
+  @include mat.card-overrides(
+    (
+      outlined-container-shape: 16px,
+      elevated-container-shape: 16px,
+    )
+  );
+  @include mat.dialog-overrides(
+    (
+      container-shape: 20px,
+    )
+  );
+
+  // Semantic colors not covered by Material's palette.
+  --app-success: light-dark(#1e7d45, #6fdd9b);
+  --app-success-container: light-dark(#d4f5e0, #0f3d22);
+  --app-warning: light-dark(#a35b00, #ffb95c);
+  --app-warning-container: light-dark(#ffe6c7, #4a2a00);
+  --app-page-bg: light-dark(#f6f7fb, #111318);
+  --app-radius: 16px;
+}
+
+html.dark-theme {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--app-page-bg);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+.material-symbols-outlined,
+mat-icon.mat-icon {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+// ---------------------------------------------------------------------------
+// Snackbar variants (NotificationService passes these as panelClass).
+// ---------------------------------------------------------------------------
+.snack-success {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--app-success-container),
+      supporting-text-color: var(--mat-sys-on-surface),
+      button-color: var(--app-success),
+    )
+  );
+}
+
+.snack-error {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--mat-sys-error-container),
+      supporting-text-color: var(--mat-sys-on-error-container),
+      button-color: var(--mat-sys-error),
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Small utility classes shared by feature pages.
+// ---------------------------------------------------------------------------
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}
+
+.surface-card {
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--app-radius);
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-large);
+  letter-spacing: 0.04em;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+// A small spinner shown inside a button while it saves.
+.mat-mdc-button-base .mat-mdc-progress-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.danger-button {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// The card being dragged in the enrollment board (rendered at the end of <body>).
+.cdk-drag-preview.course-card {
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow: var(--mat-sys-level3);
+  background: var(--mat-sys-surface-container-lowest);
+  opacity: 0.95;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Chart tokens. Validated with the dataviz palette checker against the card surface
+// in both modes (single series blue; ordinal blue ramp for credit bands).
+// ---------------------------------------------------------------------------
+html {
+  --viz-series: light-dark(#2a78d6, #3987e5);
+  --viz-series-hover: light-dark(#256abf, #5598e7);
+  --viz-track: light-dark(#cde2fb, #0d366b);
+  --viz-critical: #d03b3b;
+  --viz-grid: light-dark(#e1e0d9, #2c2c2a);
+  --viz-baseline: light-dark(#c3c2b7, #383835);
+  --viz-band-0: light-dark(#d6d5cf, #383835);
+  --viz-band-1: light-dark(#86b6ef, #184f95);
+  --viz-band-2: light-dark(#3987e5, #256abf);
+  --viz-band-3: light-dark(#1c5cab, #5598e7);
+  --viz-band-4: light-dark(#0d366b, #9ec5f4);
+}
+
+// Page transitions (router withViewTransitions): a quick cross-fade.
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+// Ctrl+K command palette dialog.
+.command-palette-panel .mat-mdc-dialog-surface {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+// Undo snackbar: neutral tone, prominent action.
+.snack-undo {
+  @include mat.snack-bar-overrides(
+    (
+      button-color: var(--mat-sys-inverse-primary),
+    )
+  );
+}

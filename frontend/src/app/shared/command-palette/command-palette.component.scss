@@ -1,0 +1,134 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: min(560px, 76vh);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  mat-icon {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-title-medium);
+  }
+}
+
+.results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.group {
+  padding: 10px 12px 6px;
+  font: var(--mat-sys-label-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  &.active {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+
+    .enter {
+      visibility: visible;
+    }
+  }
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hint {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.enter {
+  visibility: hidden;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+footer {
+  display: flex;
+  gap: 16px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+
+  .tip {
+    margin-left: auto;
+
+    @media (max-width: 600px) {
+      display: none;
+    }
+  }
+}
+
+kbd {
+  display: inline-block;
+  min-width: 20px;
+  margin: 0 2px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  font: var(--mat-sys-label-small);
+  text-align: center;
+}

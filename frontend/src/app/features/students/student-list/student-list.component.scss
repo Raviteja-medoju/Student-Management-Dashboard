@@ -1,0 +1,139 @@
+.table-card {
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 16px 4px;
+}
+
+.search {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+.course-filter {
+  flex: 0 1 280px;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.skeleton-rows {
+  padding: 8px 16px 16px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 52px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.progress-slot {
+  height: 4px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden; // the row entrance animation must not flash a vertical scrollbar
+}
+
+table {
+  width: 100%;
+  background: transparent;
+}
+
+tr.mat-mdc-row {
+  cursor: pointer;
+  transition: background 120ms ease;
+  animation: row-in 260ms ease backwards;
+  animation-delay: calc(var(--i, 0) * 25ms);
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.name-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  a {
+    color: inherit;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.small {
+  font: var(--mat-sys-body-small);
+}
+
+.hide-wide {
+  display: none;
+
+  @media (max-width: 799px) {
+    display: inline;
+  }
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-large);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+
+  &.zero {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+mat-paginator {
+  background: transparent;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tr.mat-mdc-row {
+    animation: none;
+  }
+}

@@ -1,0 +1,13 @@
+# Test profile: each Spring context gets its own empty in-memory database and no demo data,
+# so tests control their own fixtures and never see each other's rows.
+spring:
+  datasource:
+    url: jdbc:h2:mem:test-${random.uuid};DB_CLOSE_DELAY=-1
+
+app:
+  seed:
+    enabled: false
+
+logging:
+  level:
+    com.example.studentmgmt: WARN

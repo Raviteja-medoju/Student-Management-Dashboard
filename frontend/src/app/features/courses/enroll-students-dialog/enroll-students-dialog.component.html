@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>Enroll students in {{ course.code }}</h2>
+
+<mat-dialog-content>
+  <p class="muted seats">
+    <mat-icon aria-hidden="true">event_seat</mat-icon>
+    {{ seatsLeft() }} of {{ course.capacity }} seats available
+  </p>
+
+  <mat-form-field class="full-width">
+    <mat-icon matPrefix>person_search</mat-icon>
+    <mat-label>Search students</mat-label>
+    <input
+      matInput
+      [formControl]="searchControl"
+      [matAutocomplete]="auto"
+      [readonly]="seatsLeft() <= 0"
+      placeholder="Type a name or email"
+      data-testid="enroll-search"
+    />
+    @if (searching()) {
+      <mat-spinner matSuffix diameter="18" />
+    }
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayNothing"
+      (optionSelected)="pick($event)"
+    >
+      @for (student of suggestions(); track student.id) {
+        <mat-option [value]="student">
+          <span class="option">
+            <app-avatar [name]="student.fullName" [size]="28" />
+            <span class="option-text">
+              <span>{{ student.fullName }}</span>
+              <span class="muted small">{{ student.email }}</span>
+            </span>
+          </span>
+        </mat-option>
+      } @empty {
+        @if (!searching()) {
+          <mat-option disabled>No students to add</mat-option>
+        }
+      }
+    </mat-autocomplete>
+    @if (seatsLeft() <= 0) {
+      <mat-hint>The course is full with this selection.</mat-hint>
+    }
+  </mat-form-field>
+
+  @if (picked().length) {
+    <mat-chip-set aria-label="Students to enroll">
+      @for (student of picked(); track student.id) {
+        <mat-chip (removed)="unpick(student)">
+          {{ student.fullName }}
+          <button matChipRemove [attr.aria-label]="'Remove ' + student.fullName">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      }
+    </mat-chip-set>
+  } @else {
+    <p class="muted empty">Pick one or more students from the search.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close [disabled]="saving()">Cancel</button>
+  <button
+    matButton="filled"
+    (click)="enroll()"
+    [disabled]="!picked().length || saving()"
+    data-testid="confirm-enroll"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+    }
+    Enroll {{ picked().length || '' }} {{ picked().length === 1 ? 'student' : 'students' }}
+  </button>
+</mat-dialog-actions>

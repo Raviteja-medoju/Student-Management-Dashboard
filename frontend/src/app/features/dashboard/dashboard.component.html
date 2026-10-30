@@ -1,0 +1,145 @@
+<div class="page">
+  <app-page-header title="Dashboard" subtitle="An overview of students, courses and enrollments">
+    <a matButton="outlined" routerLink="/courses">
+      <mat-icon>menu_book</mat-icon>
+      Courses
+    </a>
+    <a matButton="filled" routerLink="/students/new">
+      <mat-icon>person_add</mat-icon>
+      Add student
+    </a>
+  </app-page-header>
+
+  @let state = state$ | async;
+  @if (state?.status === 'ready') {
+    @let stats = state.stats;
+    <section class="stats" aria-label="Key numbers">
+      <a class="stat surface-card" routerLink="/students" style="--i: 0">
+        <span class="stat-icon blue"><mat-icon>group</mat-icon></span>
+        <span class="stat-value" [appCountUp]="stats.totalStudents"></span>
+        <span class="stat-label">Students</span>
+      </a>
+      <a class="stat surface-card" routerLink="/courses" style="--i: 1">
+        <span class="stat-icon violet"><mat-icon>menu_book</mat-icon></span>
+        <span class="stat-value" [appCountUp]="stats.totalCourses"></span>
+        <span class="stat-label">Courses</span>
+      </a>
+      <div class="stat surface-card" style="--i: 2">
+        <span class="stat-icon green"><mat-icon>how_to_reg</mat-icon></span>
+        <span class="stat-value" [appCountUp]="stats.totalEnrollments"></span>
+        <span class="stat-label">Enrollments · {{ stats.seatUtilizationPercent }}% of seats</span>
+      </div>
+      <div class="stat surface-card" style="--i: 3">
+        <span class="stat-icon amber"><mat-icon>workspace_premium</mat-icon></span>
+        <span
+          class="stat-value"
+          [appCountUp]="stats.averageCreditsPerStudent"
+          [decimals]="1"
+        ></span>
+        <span class="stat-label">Avg. credits per student</span>
+      </div>
+    </section>
+
+    <div class="panels">
+      <section class="panel surface-card wide" aria-labelledby="trend-heading" style="--i: 4">
+        <header>
+          <div>
+            <h2 id="trend-heading">New enrollments</h2>
+            <p class="muted">Per month, last six months</p>
+          </div>
+        </header>
+        <app-monthly-enrollments-chart [data]="stats.enrollmentsByMonth" />
+      </section>
+
+      <section class="panel surface-card" aria-labelledby="load-heading" style="--i: 5">
+        <header>
+          <div>
+            <h2 id="load-heading">Credit load</h2>
+            <p class="muted">Students by enrolled credits · 12+ is full-time</p>
+          </div>
+          <a matButton routerLink="/students" [queryParams]="{ status: 'fulltime' }">Full-time</a>
+        </header>
+        <app-credit-load-chart [data]="stats.creditLoad" />
+      </section>
+
+      <section class="panel surface-card" aria-labelledby="seats-heading" style="--i: 6">
+        <header>
+          <div>
+            <h2 id="seats-heading">Seats by course</h2>
+            <p class="muted">How full each course is</p>
+          </div>
+          <a matButton routerLink="/courses">All courses</a>
+        </header>
+        @if (stats.enrollmentsPerCourse.length) {
+          <app-course-seats-chart [data]="stats.enrollmentsPerCourse" />
+        } @else {
+          <app-empty-state
+            icon="menu_book"
+            title="No courses yet"
+            message="Create a course to see it here."
+          />
+        }
+      </section>
+
+      <section class="panel surface-card" aria-labelledby="recent-heading" style="--i: 7">
+        <header>
+          <div>
+            <h2 id="recent-heading">Recently added students</h2>
+            <p class="muted">Newest first</p>
+          </div>
+          <a matButton routerLink="/students" [queryParams]="{ sort: 'createdAt', dir: 'desc' }"
+            >View all</a
+          >
+        </header>
+        @for (student of stats.recentStudents; track student.id) {
+          <a class="student-row" [routerLink]="['/students', student.id]">
+            <app-avatar [name]="student.fullName" />
+            <span class="student-text">
+              <strong>{{ student.fullName }}</strong>
+              <span class="muted">{{ student.email }}</span>
+            </span>
+            <span class="pill">
+              {{ student.enrolledCourseCount }}
+              {{ student.enrolledCourseCount === 1 ? 'course' : 'courses' }}
+            </span>
+          </a>
+        } @empty {
+          <app-empty-state
+            icon="group"
+            title="No students yet"
+            message="Add a student to get started."
+          />
+        }
+      </section>
+    </div>
+  } @else if (state?.status === 'error') {
+    <div class="surface-card">
+      <app-empty-state
+        icon="cloud_off"
+        tone="error"
+        title="Could not load the dashboard"
+        message="The server did not respond. Make sure the backend is running on port 8080."
+      >
+        <button matButton="filled" (click)="retry()">Try again</button>
+      </app-empty-state>
+    </div>
+  } @else {
+    <section class="stats" aria-label="Loading">
+      @for (tile of skeletonTiles; track tile) {
+        <div class="stat surface-card">
+          <app-skeleton class="stat-icon" width="48px" height="48px" radius="14px" />
+          <app-skeleton width="60px" height="28px" />
+          <app-skeleton width="110px" />
+        </div>
+      }
+    </section>
+    <div class="panels">
+      @for (panel of skeletonTiles; track panel) {
+        <div class="panel surface-card skeleton-panel" [class.wide]="panel === 0">
+          <app-skeleton width="40%" height="18px" />
+          <app-skeleton width="100%" height="160px" radius="12px" />
+        </div>
+      }
+    </div>
+  }
+</div>

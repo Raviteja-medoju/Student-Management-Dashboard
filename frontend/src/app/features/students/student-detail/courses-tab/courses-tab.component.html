@@ -1,0 +1,189 @@
+<div class="summary-bar">
+  <div class="totals">
+    <span
+      ><strong>{{ selectedIds().size }}</strong>
+      {{ selectedIds().size === 1 ? 'course' : 'courses' }}</span
+    >
+    <span class="dot">·</span>
+    <span
+      ><strong>{{ totalCredits() }}</strong> credits</span
+    >
+    @if (hasChanges()) {
+      @if (added().length) {
+        <span class="change added">+{{ added().length }} added</span>
+      }
+      @if (removed().length) {
+        <span class="change removed">−{{ removed().length }} removed</span>
+      }
+    }
+  </div>
+  <span class="spacer"></span>
+  <button matButton (click)="reset()" [disabled]="!hasChanges() || saving()">Reset</button>
+  <button
+    matButton="filled"
+    (click)="save()"
+    [disabled]="!hasChanges() || saving()"
+    data-testid="save-enrollment"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      <mat-icon>how_to_reg</mat-icon>
+    }
+    Save enrollment
+  </button>
+</div>
+
+<p class="hint muted">
+  <mat-icon aria-hidden="true">drag_indicator</mat-icon>
+  Drag courses between the columns, or use the + and − buttons. Nothing is saved until you press
+  <strong>Save enrollment</strong>.
+</p>
+
+@if (loading() && courses().length === 0) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<div class="board" cdkDropListGroup>
+  <section class="column" aria-labelledby="available-heading">
+    <header>
+      <h3 id="available-heading">
+        Available <span class="count">{{ availableCourses().length }}</span>
+      </h3>
+      <mat-form-field class="filter" subscriptSizing="dynamic">
+        <mat-icon matPrefix>filter_list</mat-icon>
+        <mat-label>Filter</mat-label>
+        <input
+          matInput
+          [value]="filter()"
+          (input)="filter.set($any($event.target).value)"
+          autocomplete="off"
+        />
+      </mat-form-field>
+    </header>
+
+    <div
+      class="drop-zone"
+      cdkDropList
+      id="available-courses"
+      [cdkDropListData]="availableCourses()"
+      cdkDropListSortingDisabled
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      @for (course of availableCourses(); track course.id) {
+        <div
+          class="course-card"
+          cdkDrag
+          [cdkDragData]="course"
+          [cdkDragDisabled]="isLocked(course) || saving()"
+          [class.locked]="isLocked(course)"
+          [class.dropped]="isDropped(course)"
+          [attr.data-testid]="'course-' + course.code"
+        >
+          <mat-icon class="handle" aria-hidden="true">{{
+            isLocked(course) ? 'lock' : 'drag_indicator'
+          }}</mat-icon>
+          <div class="info">
+            <div class="title-row">
+              <span class="code-badge">{{ course.code }}</span>
+              <span class="title">{{ course.title }}</span>
+            </div>
+            <div class="meta">
+              <span class="credits">{{ course.credits }} cr</span>
+              @if (isDropped(course)) {
+                <span class="tag removed">will be removed</span>
+              }
+              <app-seat-meter
+                class="meter"
+                [enrolled]="course.enrolledCount"
+                [capacity]="course.capacity"
+              />
+            </div>
+          </div>
+          <button
+            matIconButton
+            (click)="toggle(course)"
+            [disabled]="isLocked(course) || saving()"
+            [matTooltip]="isLocked(course) ? 'Course is full' : 'Add to enrolled'"
+            [attr.aria-label]="'Add ' + course.code"
+          >
+            <mat-icon>add_circle</mat-icon>
+          </button>
+          <div class="placeholder" *cdkDragPlaceholder></div>
+        </div>
+      } @empty {
+        @if (!loading()) {
+          <app-empty-state
+            icon="menu_book"
+            [title]="filter() ? 'No matching courses' : 'Nothing left to add'"
+            [message]="
+              filter()
+                ? 'Try a different code or title.'
+                : 'Every course is already in the Enrolled column.'
+            "
+          />
+        }
+      }
+    </div>
+  </section>
+
+  <section class="column enrolled" aria-labelledby="enrolled-heading">
+    <header>
+      <h3 id="enrolled-heading">
+        Enrolled <span class="count">{{ selectedCourses().length }}</span>
+      </h3>
+      <span class="muted credits-total">{{ totalCredits() }} credits</span>
+    </header>
+
+    <div
+      class="drop-zone"
+      cdkDropList
+      id="enrolled-courses"
+      [cdkDropListData]="selectedCourses()"
+      [cdkDropListEnterPredicate]="canEnroll"
+      cdkDropListSortingDisabled
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      @for (course of selectedCourses(); track course.id) {
+        <div
+          class="course-card selected"
+          cdkDrag
+          [cdkDragData]="course"
+          [cdkDragDisabled]="saving()"
+          [class.new]="isNew(course)"
+          [attr.data-testid]="'enrolled-' + course.code"
+        >
+          <mat-icon class="handle" aria-hidden="true">drag_indicator</mat-icon>
+          <div class="info">
+            <div class="title-row">
+              <span class="code-badge">{{ course.code }}</span>
+              <span class="title">{{ course.title }}</span>
+            </div>
+            <div class="meta">
+              <span class="credits">{{ course.credits }} cr</span>
+              @if (isNew(course)) {
+                <span class="tag added">new</span>
+              }
+              <a class="details" [routerLink]="['/courses', course.id]">Details</a>
+            </div>
+          </div>
+          <button
+            matIconButton
+            (click)="toggle(course)"
+            [disabled]="saving()"
+            matTooltip="Remove"
+            [attr.aria-label]="'Remove ' + course.code"
+          >
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+          <div class="placeholder" *cdkDragPlaceholder></div>
+        </div>
+      } @empty {
+        <div class="drop-hint">
+          <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
+          <span>Drag courses here, or press + on a course.</span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

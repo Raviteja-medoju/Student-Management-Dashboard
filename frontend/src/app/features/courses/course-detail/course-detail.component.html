@@ -1,0 +1,104 @@
+<div class="page">
+  <a matButton class="back-link" routerLink="/courses">
+    <mat-icon>arrow_back</mat-icon>
+    All courses
+  </a>
+
+  @let state = state$ | async;
+  @if (state?.status === 'ready') {
+    @let course = state.course;
+    <header class="hero surface-card">
+      <div class="hero-main">
+        <span class="code-badge">{{ course.code }}</span>
+        <h1>{{ course.title }}</h1>
+        <p class="muted">{{ course.description || 'No description.' }}</p>
+      </div>
+      <div class="hero-actions">
+        <button matButton="outlined" (click)="edit(course)"><mat-icon>edit</mat-icon>Edit</button>
+        <button matButton="outlined" class="delete" (click)="delete(course)">
+          <mat-icon>delete</mat-icon>Delete
+        </button>
+      </div>
+    </header>
+
+    <section class="numbers">
+      <div class="number surface-card">
+        <span class="value">{{ course.credits }}</span
+        ><span class="muted">credits</span>
+      </div>
+      <div class="number surface-card">
+        <span class="value">{{ course.enrolledCount }}</span
+        ><span class="muted">enrolled</span>
+      </div>
+      <div class="number surface-card">
+        <span class="value">{{ course.availableSeats }}</span
+        ><span class="muted">seats left</span>
+      </div>
+      <div class="number surface-card meter">
+        <app-seat-meter [enrolled]="course.enrolledCount" [capacity]="course.capacity" />
+      </div>
+    </section>
+
+    <section class="surface-card roster" aria-labelledby="roster-heading">
+      <header class="roster-header">
+        <h2 id="roster-heading">Enrolled students</h2>
+        <button
+          matButton="tonal"
+          (click)="enrollStudents(course)"
+          [disabled]="course.availableSeats === 0"
+          [matTooltip]="course.availableSeats === 0 ? 'The course is full' : ''"
+          data-testid="enroll-students"
+        >
+          <mat-icon>group_add</mat-icon>
+          Enroll students
+        </button>
+      </header>
+      @for (student of course.students; track student.studentId) {
+        <a class="row" [routerLink]="['/students', student.studentId]">
+          <app-avatar [name]="student.fullName" />
+          <span class="who">
+            <strong>{{ student.fullName }}</strong>
+            <span class="muted">{{ student.email }}</span>
+          </span>
+          <span class="muted since">Enrolled {{ student.enrolledOn | date: 'mediumDate' }}</span>
+          <button
+            matIconButton
+            class="remove"
+            (click)="unenroll(course, student, $event)"
+            matTooltip="Remove from course"
+            [attr.aria-label]="'Remove ' + student.fullName + ' from ' + course.code"
+          >
+            <mat-icon>person_remove</mat-icon>
+          </button>
+        </a>
+      } @empty {
+        <app-empty-state
+          icon="group_off"
+          title="No students enrolled yet"
+          message="Add students to this course."
+        >
+          <button matButton="outlined" (click)="enrollStudents(course)">Enroll students</button>
+        </app-empty-state>
+      }
+    </section>
+  } @else if (state?.status === 'not-found') {
+    <div class="surface-card">
+      <app-empty-state icon="search_off" title="Course not found" [message]="state.message">
+        <a matButton="filled" routerLink="/courses">Back to courses</a>
+      </app-empty-state>
+    </div>
+  } @else if (state?.status === 'error') {
+    <div class="surface-card">
+      <app-empty-state
+        icon="cloud_off"
+        tone="error"
+        title="Could not load this course"
+        [message]="state.message"
+      >
+        <a matButton="filled" routerLink="/courses">Back to courses</a>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="loading"><mat-spinner diameter="40" aria-label="Loading course" /></div>
+  }
+</div>

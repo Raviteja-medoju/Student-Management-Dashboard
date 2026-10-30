@@ -1,0 +1,238 @@
+<div class="page">
+  @let total = (store.total$ | async) ?? 0;
+  @let query = store.query$ | async;
+  @let filtered = hasFilters(query);
+  <app-page-header
+    title="Students"
+    [subtitle]="
+      filtered
+        ? total + (total === 1 ? ' student matches' : ' students match') + ' your filters'
+        : total + (total === 1 ? ' student' : ' students') + ' in total'
+    "
+  >
+    <button
+      matButton="outlined"
+      (click)="export()"
+      [disabled]="exporting()"
+      data-testid="export-csv"
+    >
+      @if (exporting()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        <mat-icon>download</mat-icon>
+      }
+      Export CSV
+    </button>
+    <a matButton="filled" routerLink="/students/new">
+      <mat-icon>person_add</mat-icon>
+      Add student
+    </a>
+  </app-page-header>
+
+  <section class="surface-card table-card">
+    <div class="toolbar">
+      <mat-form-field class="search">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label>Search students</mat-label>
+        <input
+          matInput
+          [formControl]="searchControl"
+          placeholder="Name or email"
+          autocomplete="off"
+          data-testid="student-search"
+        />
+        @if (searchControl.value) {
+          <button matIconButton matSuffix (click)="clearSearch()" aria-label="Clear search">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="course-filter">
+        <mat-icon matPrefix>menu_book</mat-icon>
+        <mat-label>Course</mat-label>
+        <mat-select
+          [value]="query?.courseId ?? 'all'"
+          (selectionChange)="store.setCourse($event.value === 'all' ? null : $event.value)"
+          data-testid="course-filter"
+        >
+          <mat-option value="all">All courses</mat-option>
+          @for (course of courses$ | async; track course.id) {
+            <mat-option [value]="course.id">{{ course.code }} · {{ course.title }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="chips">
+      <mat-chip-listbox
+        aria-label="Filter by enrollment"
+        [value]="query?.status ?? 'all'"
+        (change)="store.setStatus($event.value ?? 'all')"
+        hideSingleSelectionIndicator
+      >
+        @for (status of statuses; track status.value) {
+          <mat-chip-option [value]="status.value" [attr.data-testid]="'status-' + status.value">
+            {{ status.label }}
+          </mat-chip-option>
+        }
+      </mat-chip-listbox>
+      @if (filtered) {
+        <button matButton class="clear" (click)="clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Clear filters
+        </button>
+      }
+    </div>
+
+    <div class="progress-slot">
+      @if (store.loading$ | async) {
+        <mat-progress-bar mode="indeterminate" aria-label="Loading students" />
+      }
+    </div>
+
+    @let students = store.students$ | async;
+    @let error = store.error$ | async;
+
+    @if (store.firstLoad$ | async) {
+      <div class="skeleton-rows" aria-label="Loading students">
+        @for (row of skeletonRows; track row) {
+          <div class="skeleton-row">
+            <app-skeleton width="36px" height="36px" radius="50%" />
+            <app-skeleton width="22%" />
+            <app-skeleton width="28%" />
+            <app-skeleton width="14%" />
+            <app-skeleton width="6%" />
+          </div>
+        }
+      </div>
+    } @else if (error && !students?.length) {
+      <app-empty-state
+        icon="cloud_off"
+        tone="error"
+        title="Could not load students"
+        [message]="error"
+      >
+        <button matButton="filled" (click)="store.load()">Try again</button>
+      </app-empty-state>
+    } @else {
+      <div class="table-scroll">
+        <table
+          mat-table
+          [dataSource]="students ?? []"
+          [trackBy]="trackById"
+          matSort
+          [matSortActive]="query ? sortColumn(query.sort) : 'name'"
+          [matSortDirection]="query?.direction ?? 'asc'"
+          matSortDisableClear
+          (matSortChange)="onSort($event)"
+          aria-label="Students"
+        >
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let student">
+              <div class="name-cell">
+                <app-avatar [name]="student.fullName" />
+                <div class="name-text">
+                  <a [routerLink]="['/students', student.id]" (click)="$event.stopPropagation()">
+                    {{ student.fullName }}
+                  </a>
+                  <span class="muted small hide-wide">{{ student.email }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+            <td mat-cell *matCellDef="let student" class="muted">{{ student.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="dateOfBirth">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date of birth</th>
+            <td mat-cell *matCellDef="let student">
+              {{ student.dateOfBirth | date: 'mediumDate' }}
+              <span class="muted small">({{ ageFrom(student.dateOfBirth) }})</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="courses">
+            <th mat-header-cell *matHeaderCellDef>Courses</th>
+            <td mat-cell *matCellDef="let student">
+              <span class="count" [class.zero]="student.enrolledCourseCount === 0">
+                {{ student.enrolledCourseCount }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="credits">
+            <th mat-header-cell *matHeaderCellDef>Credits</th>
+            <td mat-cell *matCellDef="let student">{{ student.totalCredits }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
+            <td mat-cell *matCellDef="let student" class="actions-cell">
+              <a
+                matIconButton
+                [routerLink]="['/students', student.id]"
+                (click)="$event.stopPropagation()"
+                matTooltip="Edit"
+                [attr.aria-label]="'Edit ' + student.fullName"
+              >
+                <mat-icon>edit</mat-icon>
+              </a>
+              <button
+                matIconButton
+                (click)="delete(student, $event)"
+                matTooltip="Delete"
+                [attr.aria-label]="'Delete ' + student.fullName"
+                data-testid="delete-student"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns(); sticky: true"></tr>
+          <tr
+            mat-row
+            *matRowDef="let student; columns: columns(); let i = index"
+            [style.--i]="i"
+            (click)="open(student)"
+          ></tr>
+        </table>
+      </div>
+
+      @if (students?.length === 0 && (store.loading$ | async) === false) {
+        @if (filtered) {
+          <app-empty-state
+            icon="search_off"
+            title="No matching students"
+            message="Nothing matches these filters. Try a different search or clear the filters."
+          >
+            <button matButton="outlined" (click)="clearFilters()">Clear filters</button>
+          </app-empty-state>
+        } @else {
+          <app-empty-state
+            icon="group"
+            title="No students yet"
+            message="Add your first student to get started."
+          >
+            <a matButton="filled" routerLink="/students/new">Add student</a>
+          </app-empty-state>
+        }
+      }
+
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="query?.page ?? 0"
+        [pageSize]="query?.size ?? 10"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPage($event)"
+        showFirstLastButtons
+        aria-label="Select page of students"
+      />
+    }
+  </section>
+</div>

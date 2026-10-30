@@ -1,0 +1,57 @@
+@let s = student();
+<div class="columns">
+  <section class="block">
+    <header>
+      <h2>Profile</h2>
+      <button matButton (click)="editProfile.emit()"><mat-icon>edit</mat-icon>Edit</button>
+    </header>
+    <dl>
+      <dt>Full name</dt>
+      <dd>{{ s.fullName }}</dd>
+      <dt>Email</dt>
+      <dd>
+        <a [href]="'mailto:' + s.email">{{ s.email }}</a>
+      </dd>
+      <dt>Date of birth</dt>
+      <dd>{{ s.dateOfBirth | date: 'longDate' }} ({{ age() }} years)</dd>
+      <dt>Student since</dt>
+      <dd>{{ s.createdAt | date: 'mediumDate' }}</dd>
+      <dt>Last updated</dt>
+      <dd>{{ s.updatedAt | date: 'medium' }}</dd>
+    </dl>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>Enrollment</h2>
+      <button matButton (click)="manageCourses.emit()"><mat-icon>tune</mat-icon>Manage</button>
+    </header>
+    <div class="totals">
+      <div class="total">
+        <span class="value">{{ s.enrolledCourseCount }}</span>
+        <span class="muted">courses</span>
+      </div>
+      <div class="total">
+        <span class="value">{{ s.totalCredits }}</span>
+        <span class="muted">credits</span>
+      </div>
+    </div>
+    @for (course of s.courses; track course.courseId) {
+      <a class="course" [routerLink]="['/courses', course.courseId]">
+        <span class="code-badge">{{ course.code }}</span>
+        <span class="title">{{ course.title }}</span>
+        <span class="muted meta"
+          >{{ course.credits }} cr · since {{ course.enrolledOn | date: 'MMM d' }}</span
+        >
+      </a>
+    } @empty {
+      <app-empty-state
+        icon="menu_book"
+        title="Not enrolled in any course"
+        message="Pick courses in the Courses tab."
+      >
+        <button matButton="outlined" (click)="manageCourses.emit()">Choose courses</button>
+      </app-empty-state>
+    }
+  </section>
+</div>

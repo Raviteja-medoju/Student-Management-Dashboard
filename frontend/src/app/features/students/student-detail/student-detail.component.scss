@@ -1,0 +1,112 @@
+.back-link {
+  margin: -8px 0 12px -12px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  margin-bottom: 16px;
+  background:
+    radial-gradient(
+      120% 140% at 0% 0%,
+      color-mix(in srgb, var(--mat-sys-primary) 10%, transparent),
+      transparent 60%
+    ),
+    var(--mat-sys-surface-container-lowest);
+
+  @media (max-width: 600px) {
+    flex-wrap: wrap;
+  }
+}
+
+.hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+    font-weight: 600;
+  }
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
+.email {
+  text-decoration: none;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.delete {
+  --mat-button-outlined-label-text-color: var(--mat-sys-error);
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--mat-sys-error) 40%, transparent);
+}
+
+.tabs {
+  background: transparent;
+  margin-bottom: 12px;
+}
+
+.tab-icon {
+  margin-right: 8px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.dirty-dot {
+  width: 8px;
+  height: 8px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--app-warning);
+}
+
+.tab-panel {
+  display: block;
+  padding: 24px;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: 80px;
+}

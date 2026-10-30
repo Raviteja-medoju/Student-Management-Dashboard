@@ -1,0 +1,100 @@
+<h2 mat-dialog-title>{{ course ? 'Edit ' + course.code : 'New course' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content>
+    <div class="grid">
+      <mat-form-field class="code">
+        <mat-label>Code</mat-label>
+        <input
+          matInput
+          formControlName="code"
+          (blur)="uppercaseCode()"
+          maxlength="7"
+          data-testid="course-code"
+        />
+        <mat-hint>e.g. CS101</mat-hint>
+        <mat-error>
+          @if (form.controls.code.hasError('pattern')) {
+            2–4 letters + 3 digits
+          } @else {
+            {{ errorMessage(form.controls.code, 'Code') }}
+          }
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="title">
+        <mat-label>Title</mat-label>
+        <input
+          matInput
+          formControlName="title"
+          [maxlength]="rules.titleMaxLength"
+          data-testid="course-title"
+        />
+        <mat-error>{{ errorMessage(form.controls.title, 'Title') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="description">
+        <mat-label>Description</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="3"
+          [maxlength]="rules.descriptionMaxLength"
+        ></textarea>
+        <mat-hint align="end">
+          {{ form.controls.description.value.length }} / {{ rules.descriptionMaxLength }}
+        </mat-hint>
+        <mat-error>{{ errorMessage(form.controls.description, 'Description') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Credits</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="credits"
+          [min]="rules.minCredits"
+          [max]="rules.maxCredits"
+          data-testid="course-credits"
+        />
+        <mat-hint>{{ rules.minCredits }}–{{ rules.maxCredits }}</mat-hint>
+        <mat-error>{{ errorMessage(form.controls.credits, 'Credits') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Capacity</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="capacity"
+          [min]="minCapacity"
+          [max]="rules.maxCapacity"
+          data-testid="course-capacity"
+        />
+        <mat-hint>
+          @if (course?.enrolledCount) {
+            {{ course?.enrolledCount }} already enrolled
+          } @else {
+            Max students ({{ rules.minCapacity }}–{{ rules.maxCapacity }})
+          }
+        </mat-hint>
+        <mat-error>{{ errorMessage(form.controls.capacity, 'Capacity') }}</mat-error>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" matButton (click)="cancel()">Cancel</button>
+    <button
+      type="submit"
+      matButton="filled"
+      [disabled]="form.invalid || saving()"
+      data-testid="save-course"
+    >
+      @if (saving()) {
+        <mat-spinner diameter="18" />
+      }
+      {{ course ? 'Save changes' : 'Create course' }}
+    </button>
+  </mat-dialog-actions>
+</form>

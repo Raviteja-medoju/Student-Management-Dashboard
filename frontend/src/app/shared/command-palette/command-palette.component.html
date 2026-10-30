@@ -1,0 +1,67 @@
+<div class="search">
+  <mat-icon aria-hidden="true">search</mat-icon>
+  <input
+    type="text"
+    placeholder="Search students, courses or actions…"
+    autocomplete="off"
+    spellcheck="false"
+    role="combobox"
+    aria-label="Search students, courses or actions"
+    aria-controls="palette-results"
+    aria-expanded="true"
+    [attr.aria-activedescendant]="items()[active()] ? 'palette-' + items()[active()].id : null"
+    [value]="query()"
+    (input)="onInput($any($event.target).value)"
+    (keydown)="onKeydown($event)"
+    data-testid="palette-input"
+  />
+  @if (searching()) {
+    <mat-spinner diameter="18" />
+  }
+  <kbd>Esc</kbd>
+</div>
+
+<div class="results" id="palette-results" role="listbox" aria-label="Results">
+  @for (group of groups(); track group.name) {
+    <div class="group" role="presentation">{{ group.name }}</div>
+    @for (item of group.items; track item.id) {
+      @let i = index(item);
+      <div
+        class="item"
+        role="option"
+        [id]="'palette-' + item.id"
+        [class.active]="i === active()"
+        [attr.aria-selected]="i === active()"
+        (mouseenter)="active.set(i)"
+        (click)="select(item)"
+      >
+        @if (item.avatar) {
+          <app-avatar [name]="item.avatar" [size]="28" />
+        } @else {
+          <span class="icon"
+            ><mat-icon aria-hidden="true">{{ item.icon }}</mat-icon></span
+          >
+        }
+        <span class="label">{{ item.label }}</span>
+        @if (item.hint) {
+          <span class="hint">{{ item.hint }}</span>
+        }
+        <mat-icon class="enter" aria-hidden="true">keyboard_return</mat-icon>
+      </div>
+    }
+  } @empty {
+    <div class="empty">
+      @if (searching()) {
+        Searching…
+      } @else {
+        Nothing matches “{{ query() }}”.
+      }
+    </div>
+  }
+</div>
+
+<footer>
+  <span><kbd>↑</kbd><kbd>↓</kbd> to move</span>
+  <span><kbd>Enter</kbd> to open</span>
+  <span class="tip">Type a name, email, course code or title</span>
+</footer>

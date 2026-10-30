@@ -1,0 +1,15 @@
+.grid {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  align-items: start;
+  gap: 8px 16px;
+  padding-top: 8px;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.description {
+  grid-column: 1 / -1;
+}

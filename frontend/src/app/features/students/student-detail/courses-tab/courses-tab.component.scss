@@ -1,0 +1,252 @@
+.summary-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+}
+
+.totals {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dot {
+  color: var(--mat-sys-outline);
+}
+
+.change,
+.tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+
+  &.added {
+    background: var(--app-success-container);
+    color: var(--app-success);
+  }
+
+  &.removed {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 16px;
+  font: var(--mat-sys-body-small);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  &.enrolled {
+    background: color-mix(
+      in srgb,
+      var(--mat-sys-primary) 5%,
+      var(--mat-sys-surface-container-lowest)
+    );
+    border-color: color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 56px;
+    padding: 0 4px 8px;
+  }
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font: var(--mat-sys-title-small);
+    font-weight: 600;
+  }
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.filter {
+  width: 180px;
+}
+
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 120px;
+  padding: 4px;
+  border-radius: 12px;
+  transition:
+    background 150ms ease,
+    outline-color 150ms ease;
+  outline: 2px dashed transparent;
+  outline-offset: -2px;
+
+  &.cdk-drop-list-receiving {
+    outline-color: color-mix(in srgb, var(--mat-sys-primary) 50%, transparent);
+    background: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent);
+  }
+}
+
+.course-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px 8px 6px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-lowest);
+  border: 1px solid var(--mat-sys-outline-variant);
+  cursor: grab;
+  animation: card-in 200ms ease backwards;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.selected {
+    border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+  }
+
+  &.new {
+    border-color: var(--app-success);
+    box-shadow: inset 3px 0 0 var(--app-success);
+  }
+
+  &.dropped {
+    box-shadow: inset 3px 0 0 var(--mat-sys-error);
+  }
+
+  &.locked {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+.handle {
+  flex: none;
+  color: var(--mat-sys-outline);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.credits {
+  flex: none;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+}
+
+.meter {
+  flex: 1;
+  max-width: 200px;
+}
+
+.details {
+  font: var(--mat-sys-label-medium);
+  text-decoration: none;
+}
+
+.drop-hint {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  border: 2px dashed var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+}
+
+.placeholder {
+  min-height: 60px;
+  border-radius: 12px;
+  border: 2px dashed color-mix(in srgb, var(--mat-sys-primary) 50%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-card {
+    animation: none;
+  }
+}

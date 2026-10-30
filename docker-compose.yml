@@ -1,0 +1,42 @@
+# One-command run without installing a JDK or Node:
+#   docker compose up --build      ->  app: http://localhost:4200   API: http://localhost:8080
+# Uses PostgreSQL (the "postgres" Spring profile). Credentials are local-dev defaults only.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: studentdb
+      POSTGRES_USER: student
+      POSTGRES_PASSWORD: student
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U student -d studentdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://db:5432/studentdb
+      DB_USERNAME: student
+      DB_PASSWORD: student
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

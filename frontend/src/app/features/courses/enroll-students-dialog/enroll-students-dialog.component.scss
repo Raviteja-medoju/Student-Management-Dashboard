@@ -1,0 +1,32 @@
+.seats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 16px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.small {
+  font: var(--mat-sys-body-small);
+}
+
+.empty {
+  margin: 0;
+}

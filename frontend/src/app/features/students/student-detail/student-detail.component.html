@@ -1,0 +1,121 @@
+<div class="page">
+  <a matButton class="back-link" routerLink="/students" [queryParams]="listParams">
+    <mat-icon>arrow_back</mat-icon>
+    All students
+  </a>
+
+  @let state = state$ | async;
+  @if (state?.status === 'ready' || state?.status === 'create') {
+    @let student = state?.status === 'ready' ? state.student : null;
+    @let isCreate = state?.status === 'create';
+
+    <header class="hero surface-card">
+      @if (student) {
+        <app-avatar [name]="student.fullName" [size]="64" />
+        <div class="hero-text">
+          <h1>{{ student.fullName }}</h1>
+          <a class="email" [href]="'mailto:' + student.email">{{ student.email }}</a>
+          <div class="facts">
+            <span class="fact"
+              ><mat-icon>menu_book</mat-icon>{{ student.enrolledCourseCount }} courses</span
+            >
+            <span class="fact"
+              ><mat-icon>workspace_premium</mat-icon>{{ student.totalCredits }} credits</span
+            >
+            <span class="fact"
+              ><mat-icon>cake</mat-icon>{{ ageFrom(student.dateOfBirth) }} years old</span
+            >
+          </div>
+        </div>
+        <button
+          matButton="outlined"
+          class="delete"
+          (click)="delete(student)"
+          data-testid="delete-student"
+        >
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      } @else {
+        <div class="hero-icon"><mat-icon>person_add</mat-icon></div>
+        <div class="hero-text">
+          <h1>New student</h1>
+          <p class="muted">Fill in the profile and save. Courses can be chosen right after.</p>
+        </div>
+      }
+    </header>
+
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="tabs" aria-label="Student sections">
+      @for (tab of tabs; track tab.id) {
+        <a
+          mat-tab-link
+          [active]="activeTab() === tab.id"
+          [disabled]="isCreate && tab.id !== 'profile'"
+          (click)="selectTab(tab.id, isCreate)"
+          [attr.data-testid]="'tab-' + tab.id"
+        >
+          <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
+          {{ tab.label }}
+          @if (dirtyTabs()[tab.id]) {
+            <span
+              class="dirty-dot"
+              matTooltip="Unsaved changes"
+              aria-label="Unsaved changes"
+            ></span>
+          }
+        </a>
+      }
+    </nav>
+
+    <mat-tab-nav-panel #tabPanel class="tab-panel surface-card">
+      @switch (activeTab()) {
+        @case ('profile') {
+          <app-profile-tab
+            [student]="student"
+            (saved)="onProfileSaved($event, isCreate)"
+            (dirtyChange)="setDirty('profile', $event)"
+          />
+        }
+        @case ('courses') {
+          @if (student) {
+            <app-courses-tab
+              [student]="student"
+              [courses]="(courses$ | async) ?? []"
+              [loading]="(coursesLoading$ | async) ?? false"
+              (saved)="onCoursesSaved($event)"
+              (dirtyChange)="setDirty('courses', $event)"
+            />
+          }
+        }
+        @case ('summary') {
+          @if (student) {
+            <app-summary-tab
+              [student]="student"
+              (editProfile)="selectTab('profile')"
+              (manageCourses)="selectTab('courses')"
+            />
+          }
+        }
+      }
+    </mat-tab-nav-panel>
+  } @else if (state?.status === 'not-found') {
+    <div class="surface-card">
+      <app-empty-state icon="person_off" title="Student not found" [message]="state.message">
+        <a matButton="filled" routerLink="/students">Back to students</a>
+      </app-empty-state>
+    </div>
+  } @else if (state?.status === 'error') {
+    <div class="surface-card">
+      <app-empty-state
+        icon="cloud_off"
+        tone="error"
+        title="Could not load this student"
+        [message]="state.message"
+      >
+        <a matButton="filled" routerLink="/students">Back to students</a>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="loading"><mat-spinner diameter="40" aria-label="Loading student" /></div>
+  }
+</div>

@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: student-management
+
+  # Embedded H2 by default: nothing to install. Use the "postgres" profile for PostgreSQL.
+  # Data is kept in a file (backend/data/studentdb.mv.db), so it survives restarts and can be
+  # backed up with ./backup.sh. AUTO_SERVER lets backup tools connect while the app is running.
+  datasource:
+    url: jdbc:h2:file:${app.data-dir}/studentdb;AUTO_SERVER=TRUE
+    username: sa
+    password: ""
+
+  jpa:
+    open-in-view: false            # entities never leak into the web layer; services return DTOs
+    hibernate:
+      ddl-auto: validate           # schema is owned by Flyway; Hibernate only checks it matches
+    properties:
+      hibernate:
+        default_batch_fetch_size: 50
+
+  flyway:
+    locations: classpath:db/migration
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+app:
+  # Where the H2 database file lives. start.sh sets APP_DATA_DIR to <project>/backend/data.
+  data-dir: ${APP_DATA_DIR:./data}
+  seed:
+    enabled: true   # only seeds when the database is empty
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+  api-client:
+    base-url: http://localhost:${server.port}
+
+logging:
+  level:
+    com.example.studentmgmt: INFO

@@ -1,0 +1,113 @@
+<div class="page">
+  @let all = store.courses$ | async;
+  <app-page-header title="Courses" [subtitle]="(all?.length ?? 0) + ' courses in the catalogue'">
+    <button matButton="filled" (click)="create()" data-testid="add-course">
+      <mat-icon>add</mat-icon>
+      Add course
+    </button>
+  </app-page-header>
+
+  <div class="toolbar">
+    <mat-form-field class="filter">
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-label>Filter courses</mat-label>
+      <input
+        matInput
+        [formControl]="filterControl"
+        placeholder="Code, title or description"
+        autocomplete="off"
+      />
+      @if (filterControl.value) {
+        <button matIconButton matSuffix (click)="clearFilter()" aria-label="Clear filter">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="progress-slot">
+    @if (store.loading$ | async) {
+      <mat-progress-bar mode="indeterminate" aria-label="Loading courses" />
+    }
+  </div>
+
+  @let courses = courses$ | async;
+  @let error = store.error$ | async;
+  @if (error && !all?.length) {
+    <div class="surface-card">
+      <app-empty-state
+        icon="cloud_off"
+        tone="error"
+        title="Could not load courses"
+        [message]="error"
+      >
+        <button matButton="filled" (click)="store.load()">Try again</button>
+      </app-empty-state>
+    </div>
+  } @else if (all?.length === 0 && (store.loaded$ | async) === false) {
+    <div class="grid" aria-label="Loading courses">
+      @for (card of skeletonCards; track card) {
+        <div class="course-card surface-card skeleton-card">
+          <app-skeleton width="40%" height="22px" radius="999px" />
+          <app-skeleton width="80%" height="18px" />
+          <app-skeleton width="95%" />
+          <app-skeleton width="60%" />
+          <app-skeleton width="100%" height="6px" radius="999px" />
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="grid">
+      @for (course of courses; track course.id; let i = $index) {
+        <article class="course-card surface-card" [style.--i]="i">
+          <header>
+            <span class="code-badge">{{ course.code }}</span>
+            <span class="credits">{{ course.credits }} credits</span>
+            <span class="spacer"></span>
+            <button
+              matIconButton
+              [matMenuTriggerFor]="menu"
+              [attr.aria-label]="'Actions for ' + course.code"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" xPosition="before">
+              <a mat-menu-item [routerLink]="['/courses', course.id]"
+                ><mat-icon>visibility</mat-icon>View details</a
+              >
+              <button mat-menu-item (click)="edit(course)"><mat-icon>edit</mat-icon>Edit</button>
+              <button mat-menu-item (click)="delete(course)" class="danger-item">
+                <mat-icon>delete</mat-icon>Delete
+              </button>
+            </mat-menu>
+          </header>
+          <a class="title" [routerLink]="['/courses', course.id]">{{ course.title }}</a>
+          <p class="description muted">{{ course.description || 'No description.' }}</p>
+          <app-seat-meter [enrolled]="course.enrolledCount" [capacity]="course.capacity" />
+        </article>
+      } @empty {
+        @if (all !== null && !(store.loading$ | async)) {
+          <div class="surface-card empty">
+            @if (filterControl.value) {
+              <app-empty-state
+                icon="search_off"
+                title="No matching courses"
+                message="Try a different code or title."
+              >
+                <button matButton="outlined" (click)="clearFilter()">Clear filter</button>
+              </app-empty-state>
+            } @else {
+              <app-empty-state
+                icon="menu_book"
+                title="No courses yet"
+                message="Create the first course for students to enroll in."
+              >
+                <button matButton="filled" (click)="create()">Add course</button>
+              </app-empty-state>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

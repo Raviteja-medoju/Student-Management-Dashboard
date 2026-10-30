@@ -1,0 +1,16 @@
+# OS / editor noise (each app has its own .gitignore for build output)
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.claude/
+
+# Runtime files written by start.sh (pid files, logs)
+.run/
+
+# Database backups hold real data; they travel with the folder (./pack.sh) but not to git.
+backups/*.sql
+backups/*.sql.gz
+
+# Paste-once setup prompt for a new machine (delete after use)
+NEW_MACHINE_PROMPT.md

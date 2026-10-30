@@ -1,0 +1,98 @@
+.toolbar {
+  margin-bottom: 4px;
+}
+
+.filter {
+  width: 100%;
+  max-width: 420px;
+}
+
+.progress-slot {
+  height: 4px;
+  margin-bottom: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.course-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 18px;
+  animation: card-in 300ms ease backwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--mat-sys-level2);
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -4px -8px 8px 0;
+  }
+}
+
+.credits {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+}
+
+.title {
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.description {
+  flex: 1;
+  margin: 6px 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.empty {
+  grid-column: 1 / -1;
+}
+
+.danger-item {
+  color: var(--mat-sys-error);
+
+  mat-icon {
+    color: inherit;
+  }
+}
+
+.skeleton-card {
+  gap: 12px;
+  min-height: 190px;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-card {
+    animation: none;
+  }
+}

@@ -1,0 +1,140 @@
+.back-link {
+  margin: -8px 0 12px -12px;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 24px;
+  margin-bottom: 16px;
+  background:
+    radial-gradient(
+      120% 140% at 0% 0%,
+      color-mix(in srgb, var(--mat-sys-tertiary) 10%, transparent),
+      transparent 60%
+    ),
+    var(--mat-sys-surface-container-lowest);
+}
+
+.hero-main {
+  flex: 1 1 320px;
+
+  h1 {
+    margin: 10px 0 6px;
+    font: var(--mat-sys-headline-small);
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    max-width: 640px;
+  }
+}
+
+.hero-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete {
+  --mat-button-outlined-label-text-color: var(--mat-sys-error);
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--mat-sys-error) 40%, transparent);
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(200px, 2fr);
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 760px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    .meter {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.number {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 16px 20px;
+
+  .value {
+    font: var(--mat-sys-headline-small);
+    font-weight: 700;
+  }
+
+  &.meter {
+    display: block;
+    align-self: stretch;
+    padding-top: 20px;
+  }
+}
+
+.roster {
+  padding: 8px;
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+    font-weight: 600;
+  }
+}
+
+.roster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+}
+
+.remove {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    font: var(--mat-sys-body-small);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.since {
+  font: var(--mat-sys-body-small);
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: 80px;
+}
